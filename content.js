@@ -21,30 +21,23 @@ function createMenu(selectedText) {
     menu.style.zIndex = '99999'; // Ensure the menu appears above other elements
     menu.style.fontFamily = 'Arial, sans-serif';
     menu.style.fontSize = '14px';
-    menu.style.color = 'rgb(0, 60, 255)';
+    menu.style.color = 'rgb(255, 255, 255)'; // White text color
 
-    // Display selected text as a header
-    const header = document.createElement('h3');
-    header.textContent = 'Selected Text:';
-    menu.appendChild(header);
-
-    const selectedTextElement = document.createElement('p');
-    selectedTextElement.textContent = selectedText;
-    menu.appendChild(selectedTextElement);
+    const buttonStyle = 'background-color: #007bff; color: white;'; // Blue button with white text color
 
     const meaningButton = createButton('Meaning', () => {
-        alert(selectedText);
-    });
+        alert(`Meaning: ${selectedText}`);
+    }, buttonStyle);
     const summarizeButton = createButton('Summarize', () => {
-        alert('Summarized');
-    });
+        alert(`Summarized: ${selectedText}`);
+    }, buttonStyle);
     const translateButton = createButton('Translate', () => {
         const languages = ['English', 'Spanish', 'French', 'German', 'Italian', 'Chinese', 'Japanese', 'Arabic', 'Russian', 'Portuguese'];
         const selectedLanguage = prompt('Select a language:', languages.join(', '));
         if (selectedLanguage) {
-            alert(selectedText);
+            alert(`Translated to ${selectedLanguage}: ${selectedText}`);
         }
-    });
+    }, buttonStyle);
 
     menu.appendChild(meaningButton);
     menu.appendChild(summarizeButton);
@@ -53,10 +46,11 @@ function createMenu(selectedText) {
     return menu;
 }
 
-// Function to create a button with given text and click handler
-function createButton(text, onClick) {
+// Function to create a button with given text, click handler, and style
+function createButton(text, onClick, style) {
     const button = document.createElement('button');
     button.textContent = text;
+    button.style = style;
     button.style.marginRight = '5px';
     button.addEventListener('click', onClick);
     return button;
