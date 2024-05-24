@@ -29,18 +29,13 @@ function createMenu(selectedText) {
 
     const buttonStyle = 'background-color: white; color: black; border: 1px solid white; border-radius: 5px; padding: 5px 10px;';
 
-    const meaningButton = createButton('Meaning', async (event) => {
-        event.target.textContent = 'Loading...'; // Show loading text
-        event.target.disabled = true; // Disable button during loading
+    const meaningButton = createButton('Meaning', async () => {
         try {
             const meaning = await fetchMeaning(selectedText);
             alert(`Meaning: ${meaning}`);
         } catch (error) {
             console.error('Error fetching meaning:', error);
             alert('Error fetching meaning');
-        } finally {
-            event.target.textContent = 'Meaning'; // Restore original text
-            event.target.disabled = false; // Enable button after loading
         }
     }, buttonStyle);
 
@@ -74,24 +69,20 @@ function createButton(text, onClick, style) {
 
 // Function to fetch the meaning of the selected text from the server
 async function fetchMeaning(selectedText) {
-    try {
-        const response = await fetch('http://127.0.0.1:5000/meaning', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ text: selectedText })
-        });
+    const response = await fetch('http://127.0.0.1:5000/meaning', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text: selectedText })
+    });
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch meaning');
-        }
-
-        const data = await response.json();
-        return data.meaning;
-    } catch (error) {
-        throw new Error('Error fetching meaning');
+    if (!response.ok) {
+        throw new Error('Failed to fetch meaning');
     }
+
+    const data = await response.json();
+    return data.meaning;
 }
 
 // Listen for mouseup event to check for selected text
