@@ -1,5 +1,6 @@
 // Function to show options for selected text
 function showOptions(x, y, selectedText) {
+    console.log('Showing options for:', selectedText);
     let menu = document.getElementById('text-interaction-menu');
     if (!menu) {
         menu = createMenu(selectedText);
@@ -14,23 +15,29 @@ function showOptions(x, y, selectedText) {
 function createMenu(selectedText) {
     const menu = document.createElement('div');
     menu.id = 'text-interaction-menu';
-    menu.style.backgroundColor = 'white';
-    menu.style.border = '1px solid #ccc';
+    menu.style.backgroundColor = 'violet'; // Changed background color to violet
+    menu.style.border = '1px solid white';
     menu.style.padding = '10px';
-    menu.style.boxShadow = '0 0 5px rgba(0,0,0,0.2)';
-    menu.style.zIndex = '99999'; // Ensure the menu appears above other elements
+    menu.style.boxShadow = '0 0 5px rgba(255,255,255,0.2)';
+    menu.style.zIndex = '99999';
     menu.style.fontFamily = 'Arial, sans-serif';
     menu.style.fontSize = '14px';
-    menu.style.color = 'rgb(255, 255, 255)'; // White text color
+    menu.style.color = 'white';
+    menu.style.borderRadius = '5px';
+    menu.style.display = 'flex';
+    menu.style.flexDirection = 'column';
+    menu.style.gap = '10px'; // Add some space between the buttons
 
-    const buttonStyle = 'background-color: #007bff; color: white;'; // Blue button with white text color
+    const buttonStyle = 'background-color: white; color: black; border: 1px solid white; border-radius: 5px; padding: 5px 10px;';
 
-    const meaningButton = createButton('Meaning', () => {
-        alert(`Meaning: ${selectedText}`);
+    const meaningButton = createButton('Meaning', async () => {
+        await fetchMeaning(selectedText);
     }, buttonStyle);
+
     const summarizeButton = createButton('Summarize', () => {
         alert(`Summarized: ${selectedText}`);
     }, buttonStyle);
+
     const translateButton = createButton('Translate', () => {
         const languages = ['English', 'Spanish', 'French', 'German', 'Italian', 'Chinese', 'Japanese', 'Arabic', 'Russian', 'Portuguese'];
         const selectedLanguage = prompt('Select a language:', languages.join(', '));
@@ -51,9 +58,32 @@ function createButton(text, onClick, style) {
     const button = document.createElement('button');
     button.textContent = text;
     button.style = style;
-    button.style.marginRight = '5px';
     button.addEventListener('click', onClick);
     return button;
+}
+
+// Function to fetch the meaning of the selected text from the server
+async function fetchMeaning(selectedText) {
+    try {
+        const response = await fetch('http://127.0.0.1:5000/meaning', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text: selectedText })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch meaning');
+        }
+
+        const data = await response.json();
+        console.log('Meaning:', data.meaning);
+        alert(data.meaning); // Display the meaning in an alert
+    } catch (error) {
+        console.error('Error fetching meaning:', error);
+        alert('Error fetching meaning');
+    }
 }
 
 // Listen for mouseup event to check for selected text
@@ -69,3 +99,5 @@ document.addEventListener('mouseup', function(event) {
         }
     }
 });
+
+console.log('Content script loaded');
