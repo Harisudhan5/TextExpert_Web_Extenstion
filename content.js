@@ -1,6 +1,5 @@
 // Function to show options for selected text
 function showOptions(x, y, selectedText) {
-    console.log('Showing options for:', selectedText);
     let menu = document.getElementById('text-interaction-menu');
     if (!menu) {
         menu = createMenu(selectedText);
@@ -30,8 +29,19 @@ function createMenu(selectedText) {
 
     const buttonStyle = 'background-color: white; color: black; border: 1px solid white; border-radius: 5px; padding: 5px 10px;';
 
-    const meaningButton = createButton('Meaning', async () => {
-        await fetchMeaning(selectedText);
+    const meaningButton = createButton('Meaning', async (event) => {
+        event.target.textContent = 'Loading...'; // Show loading text
+        event.target.disabled = true; // Disable button during loading
+        try {
+            const meaning = await fetchMeaning(selectedText);
+            alert(`Meaning: ${meaning}`);
+        } catch (error) {
+            console.error('Error fetching meaning:', error);
+            alert('Error fetching meaning');
+        } finally {
+            event.target.textContent = 'Meaning'; // Restore original text
+            event.target.disabled = false; // Enable button after loading
+        }
     }, buttonStyle);
 
     const summarizeButton = createButton('Summarize', () => {
@@ -57,7 +67,7 @@ function createMenu(selectedText) {
 function createButton(text, onClick, style) {
     const button = document.createElement('button');
     button.textContent = text;
-    button.style = style;
+    button.style.cssText = style; // Use cssText to set multiple styles
     button.addEventListener('click', onClick);
     return button;
 }
@@ -78,11 +88,9 @@ async function fetchMeaning(selectedText) {
         }
 
         const data = await response.json();
-        console.log('Meaning:', data.meaning);
-        alert(data.meaning); // Display the meaning in an alert
+        return data.meaning;
     } catch (error) {
-        console.error('Error fetching meaning:', error);
-        alert('Error fetching meaning');
+        throw new Error('Error fetching meaning');
     }
 }
 
