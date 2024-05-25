@@ -91,11 +91,15 @@ document.addEventListener('mouseup', (event) => {
     button.disabled = true;
     button.textContent = 'Loading...';
   
-    chrome.runtime.sendMessage({ action, text }, (response) => {
-      alert(response); // You can customize this to show the result in a better way.
-      button.disabled = false;
-      button.textContent = capitalizeFirstLetter(action);
-      removeOptionsMenu();
+    // Retrieve the selected language from Chrome storage
+    chrome.storage.sync.get('selectedLanguage', ({ selectedLanguage }) => {
+      // Include the selected language in the request
+      chrome.runtime.sendMessage({ action, text, language: selectedLanguage }, (response) => {
+        alert(response); // Customize to show the result in a better way.
+        button.disabled = false;
+        button.textContent = capitalizeFirstLetter(action);
+        removeOptionsMenu();
+      });
     });
   }
   

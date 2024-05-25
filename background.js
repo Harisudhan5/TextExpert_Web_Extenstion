@@ -11,7 +11,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     chrome.tabs.sendMessage(sender.tab.id, { action: 'disableExtension' });
   } else if (message.action === 'enableExtension') {
     chrome.tabs.sendMessage(sender.tab.id, { action: 'enableExtension' });
-  } else if (['meaning', 'translate', 'summarize'].includes(message.action)) {
+  } else if (message.action === 'translate') {
+    const { text, language } = message;
+    fetch(`http://localhost:5000/translate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, language })
+    })
+      .then(response => response.json())
+      .then(data => sendResponse(data.result))
+      .catch(error => console.error('Error:', error));
+    return true; // Required to indicate async response
+  } else if (['meaning', 'summarize'].includes(message.action)) {
     fetch(`http://localhost:5000/${message.action}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
