@@ -1,102 +1,105 @@
-// Function to show options for selected text
-function showOptions(x, y, selectedText) {
-    let menu = document.getElementById('text-interaction-menu');
-    if (!menu) {
-        menu = createMenu(selectedText);
-        menu.style.position = 'fixed';
-        menu.style.left = `${x}px`;
-        menu.style.top = `${y}px`;
-        document.body.appendChild(menu);
-    }
-}
-
-// Function to create the options menu
-function createMenu(selectedText) {
-    const menu = document.createElement('div');
-    menu.id = 'text-interaction-menu';
-    menu.style.backgroundColor = 'violet'; // Changed background color to violet
-    menu.style.border = '1px solid white';
-    menu.style.padding = '10px';
-    menu.style.boxShadow = '0 0 5px rgba(255,255,255,0.2)';
-    menu.style.zIndex = '99999';
-    menu.style.fontFamily = 'Arial, sans-serif';
-    menu.style.fontSize = '14px';
-    menu.style.color = 'white';
-    menu.style.borderRadius = '5px';
-    menu.style.display = 'flex';
-    menu.style.flexDirection = 'column';
-    menu.style.gap = '10px'; // Add some space between the buttons
-
-    const buttonStyle = 'background-color: white; color: black; border: 1px solid white; border-radius: 5px; padding: 5px 10px;';
-
-    const meaningButton = createButton('Meaning', async () => {
-        try {
-            const meaning = await fetchMeaning(selectedText);
-            alert(`Meaning: ${meaning}`);
-        } catch (error) {
-            console.error('Error fetching meaning:', error);
-            alert('Error fetching meaning');
+document.addEventListener('mouseup', (event) => {
+    chrome.storage.sync.get('enabled', ({ enabled }) => {
+      if (enabled) {
+        const selectedText = window.getSelection().toString().trim();
+        if (selectedText) {
+          showOptionsMenu(event.pageX, event.pageY, selectedText);
+        } else {
+          removeOptionsMenu();
         }
-    }, buttonStyle);
-
-    const summarizeButton = createButton('Summarize', () => {
-        alert(`Summarized: ${selectedText}`);
-    }, buttonStyle);
-
-    const translateButton = createButton('Translate', () => {
-        const languages = ['English', 'Spanish', 'French', 'German', 'Italian', 'Chinese', 'Japanese', 'Arabic', 'Russian', 'Portuguese'];
-        const selectedLanguage = prompt('Select a language:', languages.join(', '));
-        if (selectedLanguage) {
-            alert(`Translated to ${selectedLanguage}: ${selectedText}`);
-        }
-    }, buttonStyle);
-
-    menu.appendChild(meaningButton);
-    menu.appendChild(summarizeButton);
-    menu.appendChild(translateButton);
-
-    return menu;
-}
-
-// Function to create a button with given text, click handler, and style
-function createButton(text, onClick, style) {
-    const button = document.createElement('button');
-    button.textContent = text;
-    button.style.cssText = style; // Use cssText to set multiple styles
-    button.addEventListener('click', onClick);
-    return button;
-}
-
-// Function to fetch the meaning of the selected text from the server
-async function fetchMeaning(selectedText) {
-    const response = await fetch('http://127.0.0.1:5000/meaning', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ text: selectedText })
+      }
     });
-
-    if (!response.ok) {
-        throw new Error('Failed to fetch meaning');
+  });
+  
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message.action === 'disableExtension') {
+      removeOptionsMenu();
     }
-
-    const data = await response.json();
-    return data.meaning;
-}
-
-// Listen for mouseup event to check for selected text
-document.addEventListener('mouseup', function(event) {
-    const selectedText = window.getSelection().toString().trim();
-
-    if (selectedText.length > 0) {
-        showOptions(event.pageX, event.pageY, selectedText);
-    } else {
-        const existingMenu = document.getElementById('text-interaction-menu');
-        if (existingMenu) {
-            existingMenu.remove();
+    if (message.action === 'enableExtension') {
+      // Add any logic needed to enable the extension on all pages
+    }
+  });
+  
+  function showOptionsMenu(x, y, selectedText) {
+    removeOptionsMenu();
+  
+    const shadowHost = document.createElement('div');
+    shadowHost.id = 'text-utilities-menu';
+    shadowHost.style.position = 'absolute';
+    shadowHost.style.top = `${y}px`;
+    shadowHost.style.left = `${x}px`;
+    shadowHost.style.zIndex = '9999';
+  
+    const shadowRoot = shadowHost.attachShadow({ mode: 'closed' });
+    shadowRoot.innerHTML = `
+      <style>
+        #menu {
+          background-color: violet;
+          border: 1px solid #ccc;
+          padding: 10px;
+          box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+          font-family: Arial, sans-serif;
+          font-size: 14px;
+          color: black;
+          width: 200px;
         }
+        #menu h3 {
+          margin-top: 0;
+        }
+        #menu p {
+          margin: 0;
+          font-style: normal;
+        }
+        button {
+          display: block;
+          margin: 5px 0;
+          width: 100%;
+          background-color: white;
+          color: black;
+          border: 1px solid #ccc;
+          cursor: pointer;
+          padding: 5px;
+        }
+        button:disabled {
+          background-color: #ddd;
+          cursor: not-allowed;
+        }
+      </style>
+      <div id="menu">
+        <button id="meaning">Meaning</button>
+        <button id="translate">Translate</button>
+        <button id="summarize">Summarize</button>
+      </div>
+    `;
+  
+    document.body.appendChild(shadowHost);
+  
+    shadowRoot.getElementById('meaning').addEventListener('click', () => handleButtonClick('meaning', selectedText, shadowRoot));
+    shadowRoot.getElementById('translate').addEventListener('click', () => handleButtonClick('translate', selectedText, shadowRoot));
+    shadowRoot.getElementById('summarize').addEventListener('click', () => handleButtonClick('summarize', selectedText, shadowRoot));
+  }
+  
+  function removeOptionsMenu() {
+    const existingMenu = document.getElementById('text-utilities-menu');
+    if (existingMenu) {
+      existingMenu.remove();
     }
-});
-
-console.log('Content script loaded');
+  }
+  
+  function handleButtonClick(action, text, shadowRoot) {
+    const button = shadowRoot.getElementById(action);
+    button.disabled = true;
+    button.textContent = 'Loading...';
+  
+    chrome.runtime.sendMessage({ action, text }, (response) => {
+      alert(response); // You can customize this to show the result in a better way.
+      button.disabled = false;
+      button.textContent = capitalizeFirstLetter(action);
+      removeOptionsMenu();
+    });
+  }
+  
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+  

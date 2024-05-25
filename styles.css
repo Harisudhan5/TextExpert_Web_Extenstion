@@ -1,0 +1,14 @@
+#text-utilities-menu {
+    position: absolute;
+    background: white;
+    border: 1px solid black;
+    padding: 10px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  #text-utilities-menu button {
+    margin: 5px 0;
+  }
+  

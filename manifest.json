@@ -1,21 +1,20 @@
 {
   "manifest_version": 3,
-  "name": "Text Interaction Extension",
+  "name": "Text Utilities",
   "version": "1.0",
-  "description": "Provides options for selected text when toggled on.",
+  "description": "Provides meaning, translation, and summary of selected text.",
   "permissions": ["activeTab", "storage"],
-  "host_permissions": ["<all_urls>"],
-
-  "action": {
-    "default_popup": "popup.html"
-  },
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "js": ["content.js"],
+      "css": ["styles.css"]
     }
-  ]
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
 }
