@@ -69,6 +69,8 @@ document.addEventListener('mouseup', (event) => {
         <button id="meaning">Meaning</button>
         <button id="translate">Translate</button>
         <button id="summarize">Summarize</button>
+        <button id="detect_language">Detect Language</button>
+        
       </div>
     `;
   
@@ -77,6 +79,8 @@ document.addEventListener('mouseup', (event) => {
     shadowRoot.getElementById('meaning').addEventListener('click', () => handleButtonClick('meaning', selectedText, shadowRoot));
     shadowRoot.getElementById('translate').addEventListener('click', () => handleButtonClick('translate', selectedText, shadowRoot));
     shadowRoot.getElementById('summarize').addEventListener('click', () => handleButtonClick('summarize', selectedText, shadowRoot));
+    shadowRoot.getElementById('detect_language').addEventListener('click', () => handleButtonClick('detect_language', selectedText, shadowRoot));
+
   }
   
   function removeOptionsMenu() {

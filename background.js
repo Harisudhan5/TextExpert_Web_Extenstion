@@ -22,7 +22,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       .then(data => sendResponse(data.result))
       .catch(error => console.error('Error:', error));
     return true; // Required to indicate async response
-  } else if (['meaning', 'summarize'].includes(message.action)) {
+  } else if (['meaning', 'summarize', 'detect_language'].includes(message.action)) {
     fetch(`http://localhost:5000/${message.action}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
