@@ -1,4 +1,7 @@
 from flask import Flask, request, jsonify
+from googletrans import Translator
+
+translator = Translator()
 
 app = Flask(__name__)
 
@@ -16,9 +19,10 @@ def translate():
     data = request.get_json()
     text = data.get('text')
     language = data.get('language')
-    print('language ------------',language)  # Get the selected language
-    # Process text to translate to the selected language
-    result = f"Translation of '{text}' to {language}"
+    translation = translator.translate(text, dest=language)
+    result = f"""Selected Text : '{text}'
+            Selected Language : {language} 
+            Translation : {translation.text}"""
     return jsonify({'result': result})
 
 @app.route('/summarize', methods=['POST'])

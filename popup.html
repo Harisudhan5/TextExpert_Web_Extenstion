@@ -7,6 +7,11 @@
       font-family: Arial, sans-serif;
       width: 300px;
     }
+    .toggle-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
   </style>
 </head>
 <body>
@@ -15,11 +20,27 @@
     <span>Enable</span>
     <input type="checkbox" id="toggle">
   </div>
+  <label for="language-select">Select Language:</label>
   <select id="language-select">
-    <option value="">Select Language</option>
-    <option value="en">English</option>
-    <option value="es">Spanish</option>
-    <!-- Add other languages as options -->
+    <option value="English">English</option>
+    <option value="Spanish">Spanish</option>
+    <option value="Chinese">Chinese</option>
+    <option value="Hindi">Hindi</option>
+    <option value="Arabic">Arabic</option>
+    <option value="Portuguese">Portuguese</option>
+    <option value="Bengali">Bengali</option>
+    <option value="Russian">Russian</option>
+    <option value="Japanese">Japanese</option>
+    <option value="Lahnda">Lahnda</option>
+    <option value="German">German</option>
+    <option value="Korean">Korean</option>
+    <option value="French">French</option>
+    <option value="Telugu">Telugu</option>
+    <option value="Marathi">Marathi</option>
+    <option value="Turkish">Turkish</option>
+    <option value="Tamil">Tamil</option>
+    <option value="Vietnamese">Vietnamese</option>
+    <option value="Urdu">Urdu</option>
   </select>
   <script src="popup.js"></script>
 </body>
