@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from googletrans import Translator
+from groq import Groq
 
 translator = Translator()
 
