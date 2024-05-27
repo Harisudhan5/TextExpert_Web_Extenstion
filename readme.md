@@ -1,0 +1,4 @@
+Flask==3.0.1
+googletrans==4.0.0rc1
+google-generativeai==0.3.2
+httpx==0.13.3
