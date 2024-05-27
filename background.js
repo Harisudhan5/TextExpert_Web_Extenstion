@@ -7,30 +7,32 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === 'disableExtension') {
-    chrome.tabs.sendMessage(sender.tab.id, { action: 'disableExtension' });
-  } else if (message.action === 'enableExtension') {
-    chrome.tabs.sendMessage(sender.tab.id, { action: 'enableExtension' });
-  } else if (message.action === 'translate') {
-    const { text, language } = message;
-    fetch(`http://localhost:5000/translate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, language })
-    })
-      .then(response => response.json())
-      .then(data => sendResponse(data.result))
-      .catch(error => console.error('Error:', error));
-    return true; // Required to indicate async response
-  } else if (['meaning', 'summarize', 'detect_language'].includes(message.action)) {
-    fetch(`http://localhost:5000/${message.action}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: message.text })
-    })
-      .then(response => response.json())
-      .then(data => sendResponse(data.result))
-      .catch(error => console.error('Error:', error));
-    return true; // Required to indicate async response
+  const { action, text, language } = message;
+
+  // Define the backend URL based on the action
+  let url;
+  if (action === 'meaning') {
+    url = 'http://localhost:5000/meaning';
+  } else if (action === 'translate') {
+    url = 'http://localhost:5000/translate';
+  } else if (action === 'summarize') {
+    url = 'http://localhost:5000/summarize';
+  } else if (action === 'detect') {
+    url = 'http://localhost:5000/detect';
   }
+
+  // Make the request to the backend
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, language })
+  })
+    .then(response => response.json())
+    .then(data => sendResponse(data.result))
+    .catch(error => {
+      console.error('Error:', error);
+      sendResponse('Error occurred while processing the request');
+    });
+
+  return true; // Required to indicate async response
 });

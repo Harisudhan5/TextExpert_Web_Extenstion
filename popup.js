@@ -11,9 +11,9 @@ function loadSelectedLanguage() {
       languageSelect.value = selectedLanguage;
     } else {
       // Set default language to English
-      languageSelect.value = "English";
+      languageSelect.value = "en";
       // Save the default language to Chrome storage
-      saveSelectedLanguage("English");
+      saveSelectedLanguage("en");
     }
   });
 }

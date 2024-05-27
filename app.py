@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from googletrans import Translator
 import google.generativeai as genai
 
-api_key = "Enter your api key"
+api_key = "Enter your API Key"
 translator = Translator()
 genai.configure(api_key = api_key)
 model = genai.GenerativeModel('gemini-1.0-pro-latest')
@@ -129,13 +129,10 @@ def meaning():
     language = data.get('language')  # Get the selected language
     # Process text to get meaning
     prompt = "Return the meaning for the following : " + str(text)
-    try:
-        response = model.generate_content(prompt).text
-    except:
-        response = "An error occured in the API call"
+    response = model.generate_content(prompt)
     result = f"""Selected Text : {text} \n
             Selected Language : {language} \n
-            Meaning : {response}"""
+            Meaning : {response.text}"""
     return jsonify({'result': result})
 
 @app.route('/translate', methods=['POST'])
@@ -144,7 +141,8 @@ def translate():
     text = data.get('text')
     language = data.get('language')
     try:
-        translation = translator.translate(text, dest=language).text
+        translation = translator.translate(text, dest=language)
+        translation = translation.text
     except:
         translation = "An error occured in translation"
     result = f"""Selected Text : '{text}'
@@ -160,7 +158,8 @@ def summarize():
     # Process text to summarize
     prompt = "Summarize the following :" + str(text) 
     try:
-        response = model.generate_content(prompt).text
+        response = model.generate_content(prompt)
+        response = response.text
     except:
         response = "An error occured in API call"
     result = f"""Selected Text : {text} \n 
@@ -168,19 +167,14 @@ def summarize():
     Summary : {response}"""
     return jsonify({'result': result})
 
-@app.route('/detect_language', methods=['POST'])
+@app.route('/detect', methods=['POST'])
 def detect_language():
     data = request.get_json()
     text = data.get('text')
-    try:
-        detected = translator.detect(text)
-        result = detected.lang
-    except:
-        result = "Error"
+    detected = translator.detect(text)
+    result = detected.lang
     if result in code_languages:
         res = code_languages[result]
-    else:
-        res = "Unknown language"
     response = f"""Detected Language : {res}"""
     return jsonify({'result': response})
 
